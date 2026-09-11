@@ -2,6 +2,21 @@
 
 AI-powered customer-support agent built for the **Hiver SDE Intern Take-Home Assignment** using real customer-support conversations from Twitter.
 
+## Data and Model Files
+
+Large datasets and trained model artifacts are intentionally excluded
+from GitHub because of their size.
+
+Excluded files:
+- models/*.joblib
+- data/raw/twcs.csv
+- data/processed/applesupport_conversations.csv
+
+The repository contains the source code, evaluation data, configuration,
+and scripts required to reproduce the preprocessing, training, retrieval,
+and evaluation pipeline.
+
+
 ## 1. What This Project Does
 
 The system performs three main tasks:
