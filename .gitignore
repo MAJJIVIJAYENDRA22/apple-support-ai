@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Environment variables
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python cache
+.pytest_cache/
+.mypy_cache/
+
+# Logs
+*.log
+
+# Generated reports
+reports/
+
+# Local data
+*.db
+*.sqlite
+*.sqlite3
+
+# Large model files
+models/*.joblib
+
+# Large datasets - kept locally, not uploaded to GitHub
+data/raw/twcs.csv
+data/processed/applesupport_conversations.csv
+data/processed/applesupport_tweets.csv
+data/processed/intent_dataset.csv

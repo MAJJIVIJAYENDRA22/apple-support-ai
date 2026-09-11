@@ -1,0 +1,6 @@
+id,customer_message,golden_intent,expected_response_type,should_escalate,escalation_reason
+1,"My iPhone cannot connect to WiFi","wifi_connectivity","troubleshooting",false,""
+2,"My iPhone battery is draining very quickly","device_issue","troubleshooting",false,""
+3,"I forgot my Apple ID password","apple_id","account_recovery",false,""
+4,"My iPhone is not turning on","device_issue","troubleshooting",true,"Device may require hardware diagnosis"
+5,"I was charged twice for my Apple purchase","billing_issue","billing_support",true,"Possible duplicate charge"

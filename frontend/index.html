@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Apple Support AI</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+
+<body>
+
+    <div class="app">
+
+        <!-- Header -->
+
+        <header class="header">
+
+            <div>
+
+                <h1>Apple Support AI</h1>
+
+                <p>
+                    Intelligent customer support assistant
+                </p>
+
+            </div>
+
+            <div
+                id="status"
+                class="status"
+            >
+                ● API Connected
+            </div>
+
+        </header>
+
+
+        <!-- Chat -->
+
+        <main
+            id="chat"
+            class="chat"
+        >
+
+            <div class="welcome">
+
+                <div class="icon">
+                    
+                </div>
+
+                <h2>
+                    How can we help you?
+                </h2>
+
+                <p>
+                    Describe your Apple support issue
+                    below.
+                </p>
+
+            </div>
+
+        </main>
+
+
+        <!-- Input -->
+
+        <footer class="input-area">
+
+            <textarea
+                id="message"
+                placeholder="Describe your issue..."
+                rows="1"
+                maxlength="5000"
+            ></textarea>
+
+            <button
+                id="send"
+                onclick="sendMessage()"
+            >
+                Send
+            </button>
+
+        </footer>
+
+    </div>
+
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>
