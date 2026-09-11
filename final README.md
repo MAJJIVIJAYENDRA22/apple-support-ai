@@ -1,0 +1,695 @@
+# Apple Support AI
+
+AI-powered customer-support agent built for the **Hiver SDE Intern Take-Home Assignment** using real customer-support conversations from Twitter.
+
+## 1. What This Project Does
+
+The system performs three main tasks:
+
+1. **Intent Classification**
+   - Understands the customer's message.
+   - Predicts an intent learned from the dataset.
+   - Returns confidence and top alternative predictions.
+
+2. **Historically Grounded Response**
+   - Searches similar historical Apple support conversations.
+   - Ranks results using semantic similarity and intent agreement.
+   - Recommends a response based on previous brand responses.
+
+3. **Human Escalation**
+   - Auto-handles only when enough evidence is available.
+   - Escalates when intent confidence or historical similarity is too low.
+
+> **Core principle:** The system is designed to answer only when there is enough evidence to produce a trustworthy response.
+
+---
+
+## 2. Example Customer Inputs
+
+```text
+My iPhone won't connect to WiFi
+
+wifi stopped working
+
+Apple ID password forgotten
+
+battery draining very fast
+
+phone disabled after password attempts
+
+I cannot download apps from the App Store
+
+My iCloud is not working
+
+I was charged twice
+
+I need help with an iOS update
+```
+
+---
+
+## 3. System Flow
+
+```text
+Customer Message
+       |
+       v
+Intent Classification
+       |
+       +---- Low Confidence ----> Human Escalation
+       |
+       v
+Historical Similarity Search
+       |
+       v
+Intent-Aware Ranking
+       |
+       +---- Low Similarity ----> Human Escalation
+       |
+       v
+Recommended Historical Response
+```
+
+---
+
+## 4. Technology Stack
+
+- Python
+- FastAPI
+- Scikit-learn
+- Pandas
+- Joblib
+- TF-IDF / cosine similarity
+- Intent classification model
+- Semantic/historical retrieval
+- LLM-as-judge evaluation support
+
+---
+
+## 5. Project Structure
+
+```text
+apple-support-ai/
+Γöé
+Γö£ΓöÇΓöÇ data/
+Γöé   ΓööΓöÇΓöÇ golden_set.csv
+Γöé
+Γö£ΓöÇΓöÇ models/
+Γöé   Γö£ΓöÇΓöÇ intent_classifier.joblib
+Γöé   Γö£ΓöÇΓöÇ retrieval_vectorizer.joblib
+Γöé   Γö£ΓöÇΓöÇ retrieval_matrix.joblib
+Γöé   ΓööΓöÇΓöÇ retrieval_data.joblib
+Γöé
+Γö£ΓöÇΓöÇ src/
+Γöé   Γö£ΓöÇΓöÇ api/
+Γöé   Γöé   ΓööΓöÇΓöÇ main.py
+Γöé   Γöé
+Γöé   Γö£ΓöÇΓöÇ retrieval/
+Γöé   Γöé   ΓööΓöÇΓöÇ search.py
+Γöé   Γöé
+Γöé   ΓööΓöÇΓöÇ ...
+Γöé
+Γö£ΓöÇΓöÇ scripts/
+Γöé   ΓööΓöÇΓöÇ train_intent_model.py
+Γöé
+Γö£ΓöÇΓöÇ evaluation/
+Γöé   ΓööΓöÇΓöÇ evaluate.py
+Γöé
+Γö£ΓöÇΓöÇ reports/
+Γöé   Γö£ΓöÇΓöÇ final_report.pdf
+Γöé   Γö£ΓöÇΓöÇ evaluation_results.json
+Γöé   ΓööΓöÇΓöÇ decision_log.md
+Γöé
+Γö£ΓöÇΓöÇ requirements.txt
+ΓööΓöÇΓöÇ README.md
+```
+
+---
+
+## 6. Installation
+
+Create and activate a virtual environment:
+
+```bash
+python -m venv venv
+```
+
+### Windows
+
+```bash
+venv\Scripts\activate
+```
+
+### macOS/Linux
+
+```bash
+source venv/bin/activate
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## 7. Train the Intent Model
+
+Make sure the required training data is available.
+
+Run:
+
+```bash
+python scripts/train_intent_model.py
+```
+
+This creates:
+
+```text
+models/intent_classifier.joblib
+```
+
+---
+
+## 8. Test Historical Retrieval
+
+Run:
+
+```bash
+python src/retrieval/search.py
+```
+
+The retrieval system tests example customer questions and returns:
+
+- Similarity score
+- Historical customer message
+- Historical brand response
+
+---
+
+## 9. Start the API
+
+Run:
+
+```bash
+uvicorn src.api.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+The API will run at:
+
+```text
+http://localhost:8000
+```
+
+Swagger documentation:
+
+```text
+http://localhost:8000/docs
+```
+
+Health check:
+
+```text
+http://localhost:8000/health
+```
+
+---
+
+## 10. Prediction API
+
+Endpoint:
+
+```text
+POST /predict
+```
+
+Request:
+
+```json
+{
+  "message": "My iPhone cannot connect to WiFi"
+}
+```
+
+Example successful response:
+
+```json
+{
+  "message": "My iPhone cannot connect to WiFi",
+  "predicted_intent": "wifi",
+  "confidence": 0.91,
+  "top_predictions": [
+    {
+      "intent": "wifi",
+      "confidence": 0.91
+    }
+  ],
+  "status": "response_generated",
+  "recommended_response": "Historical Apple support response...",
+  "similarity": 0.78,
+  "ranking_score": 0.83,
+  "ranked_results": [],
+  "escalation": {
+    "required": false,
+    "confidence_threshold": 0.70,
+    "similarity_threshold": 0.60
+  }
+}
+```
+
+If confidence or similarity is too low, the system returns:
+
+```text
+status: escalation_required
+```
+
+instead of generating an unsupported response.
+
+---
+
+# 11. Decision Logic
+
+The system uses two important thresholds:
+
+```text
+Confidence threshold = 0.70
+Similarity threshold = 0.60
+```
+
+### Intent confidence
+
+If:
+
+```text
+confidence < 0.70
+```
+
+the request is escalated.
+
+### Historical similarity
+
+If:
+
+```text
+similarity < 0.60
+```
+
+the request is escalated.
+
+This prevents the system from confidently producing responses when there is insufficient evidence.
+
+---
+
+# 12. Response Ranking
+
+Retrieved conversations are ranked using:
+
+```text
+Final Score =
+    (Similarity ├ù 0.60)
+    +
+    (Intent Confidence ├ù 0.40)
+```
+
+Therefore, the system considers both:
+
+- How similar the customer's message is to historical conversations.
+- Whether the historical conversation matches the predicted intent.
+
+The highest-ranked response becomes the recommended response when the required thresholds are satisfied.
+
+---
+
+# 13. Golden Evaluation Set
+
+The project includes a manually created evaluation set:
+
+```text
+data/golden_set.csv
+```
+
+Target size:
+
+```text
+200 examples
+```
+
+The golden set is used to evaluate:
+
+- Intent classification
+- Retrieval quality
+- Escalation behavior
+- Response quality
+
+The evaluation examples are kept separate from the model-development process as much as possible to provide a more realistic estimate of performance.
+
+---
+
+# 14. Evaluation Harness
+
+Run:
+
+```bash
+python evaluation/evaluate.py
+```
+
+The evaluation harness compares the system against:
+
+### Baseline 1 ΓÇö Majority Class
+
+Always predicts the most frequent intent.
+
+### Baseline 2 ΓÇö TF-IDF + Logistic Regression
+
+A simple text-classification baseline using:
+
+```text
+TF-IDF
++
+Logistic Regression
+```
+
+### Primary System
+
+The Apple Support AI intent model plus historical retrieval and escalation logic.
+
+---
+
+# 15. Evaluation Metrics
+
+The evaluation includes:
+
+### Intent Classification
+
+- Accuracy
+- Macro Precision
+- Macro Recall
+- Macro F1
+- Weighted F1
+
+### Retrieval
+
+- Recall@1
+- Recall@3
+- Recall@5
+- Recall@10
+- Mean Reciprocal Rank
+
+### Response Quality
+
+LLM-as-judge evaluation using:
+
+- Groundedness
+- Relevance
+- Helpfulness
+- Safety
+- Clarity
+
+Scores use a:
+
+```text
+1ΓÇô5 scale
+```
+
+### Escalation
+
+- Precision
+- Recall
+- F1
+- Auto-handled count
+- Escalated count
+
+---
+
+# 16. Evaluation Results
+
+The generated results are stored in:
+
+```text
+reports/evaluation_results.json
+```
+
+The file contains the measured metrics for:
+
+- Primary intent model
+- Majority baseline
+- TF-IDF baseline
+- Retrieval
+- Response quality
+- Escalation
+- System comparison
+- Failure analysis
+
+Run the evaluation before submission so the JSON contains actual measured values rather than placeholders.
+
+---
+
+# 17. Final Report
+
+The complete report is available at:
+
+```text
+reports/final_report.pdf
+```
+
+The report covers:
+
+- Problem framing
+- What good means for Apple support
+- What was intentionally not built
+- System architecture
+- Evaluation methodology
+- Comparison with two baselines
+- Retrieval evaluation
+- Response-quality evaluation
+- Escalation strategy
+- Top five failure modes
+- Real failure examples
+- Hypotheses for failures
+- What is misleading about the headline number
+- What would be improved with one additional week
+
+---
+
+# 18. Decision Log
+
+Non-obvious engineering decisions are documented in:
+
+```text
+reports/decision_log.md
+```
+
+Examples of documented decisions include:
+
+- Why Apple was selected
+- Why intent classification was used
+- Why historical retrieval was added
+- Why confidence thresholds were introduced
+- Why similarity thresholds were introduced
+- Why two baselines were selected
+- Why a golden set was manually labelled
+- Why unsupported responses are escalated
+- Why response generation is grounded in historical responses
+- Why evaluation is separated from training
+
+---
+
+# 19. What Good Means
+
+For this project, a good support agent is not simply one that produces an answer for every message.
+
+A good system should:
+
+- Correctly understand the customer's intent.
+- Retrieve relevant historical support evidence.
+- Recommend a response consistent with previous support behavior.
+- Avoid unsupported claims.
+- Identify uncertain cases.
+- Escalate uncertain cases to a human.
+- Provide measurable evidence that the system works.
+
+The system therefore prioritizes **trustworthiness over maximum automation**.
+
+---
+
+# 20. What We Chose Not to Build
+
+To keep the project focused and reproducible, the following were intentionally not implemented as core requirements:
+
+- Fully autonomous customer-support conversations.
+- Direct actions on customer Apple accounts.
+- Refund or payment processing.
+- Password/account changes.
+- Real customer-data access.
+- Unverified external knowledge generation.
+- Autonomous human-agent replacement.
+
+The project focuses on **intent classification, historically grounded response recommendation, and escalation**.
+
+---
+
+# 21. Failure Analysis
+
+The main expected failure categories are:
+
+1. **Incorrect intent classification**
+   - Similar customer wording can belong to different intents.
+
+2. **Low semantic similarity**
+   - Some customer messages may have no sufficiently similar historical example.
+
+3. **Incorrect historical response**
+   - A retrieved conversation may be textually similar but not the best resolution.
+
+4. **Ambiguous customer messages**
+   - Very short messages can lack enough context.
+
+5. **Over-escalation or under-escalation**
+   - Fixed thresholds may not perfectly separate safe and unsafe cases.
+
+These failures are analyzed in detail in the final report.
+
+---
+
+# 22. What Is Misleading About the Headline Number?
+
+A single accuracy or F1 score does not fully describe whether a customer-support agent is trustworthy.
+
+A high classification score can still hide:
+
+- Poor performance on rare intents.
+- Retrieval failures.
+- Incorrect historical responses.
+- Ambiguous customer messages.
+- Unsafe automatic responses.
+- Differences between benchmark examples and real production traffic.
+
+For this reason, the project evaluates multiple dimensions rather than relying on one headline metric.
+
+---
+
+# 23. Reproducibility
+
+The main evaluation command is:
+
+```bash
+python evaluation/evaluate.py
+```
+
+Random seed:
+
+```text
+42
+```
+
+Golden set:
+
+```text
+data/golden_set.csv
+```
+
+Evaluation script:
+
+```text
+evaluation/evaluate.py
+```
+
+Results:
+
+```text
+reports/evaluation_results.json
+```
+
+---
+
+# 24. Assignment Deliverables Checklist
+
+Before submitting the repository, verify that it contains:
+
+```text
+[x] Runnable project
+[x] README.md
+[x] Golden evaluation set
+[x] Evaluation harness
+[x] Primary model
+[x] Majority-class baseline
+[x] TF-IDF + Logistic Regression baseline
+[x] Retrieval evaluation
+[x] Escalation evaluation
+[x] Evaluation results JSON
+[x] Final report PDF
+[x] Decision log
+```
+
+Also verify:
+
+```text
+[ ] All required files are committed to GitHub
+[ ] No API keys or passwords are committed
+[ ] README commands work from a clean environment
+[ ] evaluation_results.json contains actual measured metrics
+[ ] golden_set.csv contains the final labelled examples
+[ ] final_report.pdf is the final version
+```
+
+---
+
+# 25. Quick Start
+
+```bash
+# 1. Install dependencies
+pip install -r requirements.txt
+
+# 2. Train model
+python scripts/train_intent_model.py
+
+# 3. Test retrieval
+python src/retrieval/search.py
+
+# 4. Start API
+uvicorn src.api.main:app --reload --host 0.0.0.0 --port 8000
+
+# 5. Run evaluation
+python evaluation/evaluate.py
+```
+
+API:
+
+```text
+http://localhost:8000
+```
+
+Swagger:
+
+```text
+http://localhost:8000/docs
+```
+
+---
+
+## Final Summary
+
+**Apple Support AI** combines:
+
+```text
+Customer Message
+       Γåô
+Intent Classification
+       Γåô
+Confidence Check
+       Γåô
+Historical Retrieval
+       Γåô
+Intent-Aware Ranking
+       Γåô
+Similarity Check
+       Γåô
+Recommended Response
+       OR
+Human Escalation
+```
+
+The system is designed around one principle:
+
+> **Automate only when the evidence is strong enough; otherwise, escalate to a human.**
